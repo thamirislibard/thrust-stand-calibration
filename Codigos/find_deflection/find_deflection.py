@@ -28,7 +28,7 @@ time1=[150,280]
 time2=[400,600]
 
 
-cutofffreq=0.05
+cutoff_freq=0.05
 order=5
 
 
@@ -53,7 +53,7 @@ for i in range(len(d)-w):
 
 N=len(d)
 fs=N/(float(data[0][N-1].replace(',', '.'))-float(data[0][0].replace(',', '.')))
-b, a = signal.butter(order, cutofffreq, analog=False, btype='lowpass', fs=fs)
+b, a = signal.butter(order, cutoff_freq, analog=False, btype='lowpass', fs=fs)
 av = signal.filtfilt(b, a, d)
 
 def find_nearest_index(array, value):
