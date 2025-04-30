@@ -4,6 +4,8 @@ Created on Tue Feb 25 15:23:44 2025
 
 @author: Adm
 """
+# O código transforma dados brutos de um sensor em uma resposta clara: 
+# "A força aplicada causou um deslocamento de X micrômetros, com uma margem de erro de Y micrômetros". 
 
 
 import matplotlib.pyplot as plt # plotagem de gráficos

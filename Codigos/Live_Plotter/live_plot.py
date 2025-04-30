@@ -5,7 +5,8 @@ Created on Wed Mar 19 21:07:18 2025
 @author: hecgi
 """
 
-
+#Este código tem um objetivo principal: monitorar em tempo real um sinal de deslocamento (medido em micrômetros) 
+# e exibi-lo dinamicamente em um gráfico, como um "osciloscópio digital".
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -15,7 +16,7 @@ import numpy as np
 import os.path
 
 
-filename='data.txt'
+filename='data.txt' # arquivo utilizado. fica em loop enquanto o arquivo existe e tem dados
 windowsize=20 #window width in s
 Ns=200
 
@@ -43,6 +44,7 @@ while True:                             #find sampling freq with first 500 sampl
         break
     else : sleep(0.1)
 
+# grafico dinamico do deslocamento (µm) pelo tempo (s). flutuações em torno de 0
 
 def animate(i):
     time = []

@@ -4,6 +4,9 @@ Created on Tue Feb 25 15:23:44 2025
 
 @author: Adm
 """
+# Este código tem um objetivo principal: 
+# analisar vibrações de um sistema mecânico (como uma balança de microempuxo) para descobrir sua frequência natural 
+# de oscilação e limpar o sinal de interferências.
 
 import numpy as np
 import matplotlib.pyplot as plt
