@@ -1,6 +1,6 @@
 # Backlog - Thrust Balance Calibration - LaSE
 
-Este documento serve como backlog do repositório do projeto **Thrust Balance Calibration - LaSE**, contendo as principais tarefas, requisitos e prioridades. Para detalhes adicionais, consulte a [planilha de acompanhamento no Google Sheets](#https://docs.google.com/spreadsheets/d/1bI2x75SJOgQma6dlL40EmWFeJrbb3BSSk1ROJQhcD8Q/edit?usp=sharing).
+Este documento serve como backlog do repositório do projeto **Thrust Balance Calibration - LaSE**, contendo as principais tarefas, requisitos e prioridades. Para detalhes adicionais, consulte a [planilha de acompanhamento no Google Sheets](https://docs.google.com/spreadsheets/d/1bI2x75SJOgQma6dlL40EmWFeJrbb3BSSk1ROJQhcD8Q/edit?usp=sharing).
 
 ---
 
