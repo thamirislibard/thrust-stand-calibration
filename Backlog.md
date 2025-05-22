@@ -1,0 +1,68 @@
+# Backlog - Thrust Balance Calibration - LaSE
+
+Este documento serve como backlog do repositório do projeto **Thrust Balance Calibration - LaSE**, contendo as principais tarefas, requisitos e prioridades. Para detalhes adicionais, consulte a [planilha de acompanhamento no Google Sheets](#https://docs.google.com/spreadsheets/d/1bI2x75SJOgQma6dlL40EmWFeJrbb3BSSk1ROJQhcD8Q/edit?usp=sharing).
+
+---
+
+## 📌 Visão Geral do Projeto
+**Objetivo**:  
+Desenvolver um sistema de calibração de balança de empuxo (thrust balance) para aplicações no Laboratório de Sistemas Espaciais (LaSE).
+
+**Principais Entregas**:
+- Software de aquisição e processamento de dados.
+- Documentação técnica e relatórios de calibração.
+- Interface de usuário para configuração e monitoramento.
+
+---
+
+## 📋 Backlog de Tarefas
+
+### 🚀 Tarefas Prioritárias
+1. **Definição de Requisitos**
+   - [x] Levantamento de requisitos com a equipe do LaSE.
+   - [ ] Documentação de especificações técnicas.
+
+2. **Desenvolvimento do Software**
+   - [ ] Implementação da aquisição de dados via sensores.
+   - [ ] Criação de algoritmos de calibração.
+   - [ ] Desenvolvimento da interface gráfica.
+
+3. **Testes e Validação**
+   - [ ] Testes em bancada com carga conhecida.
+   - [ ] Validação dos resultados com a equipe.
+
+4. **Documentação**
+   - [ ] Manual de usuário.
+   - [ ] Relatório técnico de calibração.
+
+---
+
+### 🔗 Links Úteis
+- [📊 Planilha de Acompanhamento no Google Sheets](https://docs.google.com/spreadsheets/d/SEU_LINK_AQUI)  
+  *(Acesse para detalhes sobre prazos, responsáveis e status das tarefas)*
+
+- [📂 Repositório do Projeto](https://github.com/seu-usuario/thrust-balance-calibration-lase)  
+  *(Código-fonte e documentação técnica)*
+
+---
+
+## 🗓️ Próximos Passos
+- [ ] Montagem do **sistema de posicionamento** do LVDT.
+- [ ] **Calibração com pesos** da balança.
+    - [ ] Padronizar contra-pesos.
+    - [ ] Posicionar corretamente o LVDT.
+    - [ ] Gráficos de comportamento do sensor com diferentes pesos aplicados.
+    - [ ] Fazer breve manual de aplicação - pesos utilizados, tamanho do contra-peso, códigos utilizados para gerar resultados.
+    - **Sempre fazer anotações do que for conduzido!**
+- [ ] Calibração eletromagnética.
+    - Modelagem 3D dos componentes.
+        - [x] Suporte eletroímã, suporte ímã permanente em ABS para testes.
+        - [ ] Suporte eletroímã, suporte ímã permanente em resina.
+    - [ ] Projetar detalhadamente o sistema.
+    - [ ] Fazer análise da tensão aplicada no eletrímã para a força de repulsão/atração (não são iguais. Os testes devem ser conduzidos igualmente para ambos os casos) com uma distância x entre eles (a distância pode e deve ser alterada. Os testes devem ser conduzidos igualmente para cada distância. Anotações, sempre.).
+    - [ ] Código.
+
+---
+
+**Atualizado em**: 22/05/2025 
+**Responsável**: Thamiris Libard
