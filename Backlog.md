@@ -38,10 +38,10 @@ Desenvolver um sistema de calibração de balança de empuxo (thrust balance) pa
 ---
 
 ### 🔗 Links Úteis
-- [📊 Planilha de Acompanhamento no Google Sheets](https://docs.google.com/spreadsheets/d/SEU_LINK_AQUI)  
-  *(Acesse para detalhes sobre prazos, responsáveis e status das tarefas)*
+- [📊 Planilha de Acompanhamento no Google Sheets](https://docs.google.com/spreadsheets/d/1bI2x75SJOgQma6dlL40EmWFeJrbb3BSSk1ROJQhcD8Q/edit?usp=sharing)  
+  *(Acesse para detalhes sobre prazos, responsáveis, status das tarefas, lista de materiais e referências)*
 
-- [📂 Repositório do Projeto](https://github.com/seu-usuario/thrust-balance-calibration-lase)  
+- [📂 Repositório do Projeto](https://github.com/thamirislibard/tcc-thrust_balance.git)  
   *(Código-fonte e documentação técnica)*
 
 ---
