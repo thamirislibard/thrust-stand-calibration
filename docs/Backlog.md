@@ -66,3 +66,30 @@ Desenvolver um sistema de calibração de balança de empuxo (thrust balance) pa
 
 **Atualizado em**: 22/05/2025 
 **Responsável**: Thamiris Libard
+
+
+## 💻 Guia de Execução e Operação (Software)
+```
+python -m venv .venv
+
+.\.venv\Scripts\activate
+
+pip install -r requirements.txt
+```
+
+### **🚀 Como Executar o Sistema**
+Para rodar o software localmente, é necessário garantir que o ambiente virtual esteja ativo:
+
+1. **Ativar o Ambiente Virtual (venv):**
+   - No Windows: `.\venv\Scripts\activate`
+   - No Linux/Mac: `source venv/bin/activate`
+2. **Iniciar a Interface:**
+   - No terminal, execute: `streamlit run main.py`
+3. O sistema abrirá automaticamente no navegador no endereço `localhost:8501`.
+
+### **🎮 Operação da Interface**
+* **Configuração Técnica (Sidebar):** Ajuste em tempo real da **Constante K** e dos **Braços de Alavanca ($L$)**.
+* **Módulo de Análise (Aba 1):** * **Ensaio Simulado:** Gera dados sintéticos com ruído para validar o filtro e a calibração sem hardware.
+    * **Processamento de Logs:** Suporte para arquivos `data.txt` com separadores decimais de vírgula (`,`) e colunas por espaço.
+* **Telemetria Real-Time (Aba 2):** Guia para conexão USB, identificação de porta Serial e monitoramento de fluxo bruto.
+* **Exportação:** Botões para baixar **gráficos (PNG)** e **planilhas processadas (CSV)** com métricas de Média, Pico e RMS.

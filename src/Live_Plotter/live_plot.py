@@ -1,75 +1,112 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Mar 19 21:07:18 2025
-
-@author: hecgi
+Live Plotter - Monitoramento em Tempo Real (DSP)
+Objetivo: Transformar deslocamento (µm) em Empuxo (mN) em tempo real.
 """
+import sys
+import os
 
-#Este código tem um objetivo principal: monitorar em tempo real um sinal de deslocamento (medido em micrômetros) 
-# e exibi-lo dinamicamente em um gráfico, como um "osciloscópio digital".
+# 1. Ajuste do Backend Gráfico
+try:
+    import matplotlib
+    matplotlib.use('Qt5Agg') 
+except:
+    try:
+        matplotlib.use('TkAgg')
+    except:
+        pass
+
+# 2. Configuração de Caminhos
+current_dir = os.path.dirname(os.path.abspath(__file__))
+src_dir = os.path.abspath(os.path.join(current_dir, '..'))
+if src_dir not in sys.path:
+    sys.path.append(src_dir)
 
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from time import sleep
 import numpy as np
-import os.path
+from processing import apply_lowpass_filter 
 
+# 3. Constantes de Calibração (Ajuste conforme sua bancada física)
+K_TORQUE = 0.0125  # Constante elástica k (Nm/rad)
+L_LVDT = 0.3       # Distância do LVDT ao pivô (m)
+L_THRUST = 0.25    # Distância do Propulsor ao pivô (m)
 
-filename='data.txt' # arquivo utilizado. fica em loop enquanto o arquivo existe e tem dados
-windowsize=20 #window width in s
-Ns=200
+# Definição do Arquivo de Dados
+filename = os.path.abspath(os.path.join(current_dir, '..', '..', 'data.txt'))
 
-while True:                             #wait for file to exist and have data
-    if os.path.isfile(filename)==False:
-        sleep(0.1)
-    elif os.path.getsize(filename)==0 :
-        sleep(0.1)
-    else : break
+windowsize = 20 
+Ns = 200        
 
+print(f"Buscando dados em: {filename}")
 
-D = []
-A = []
-
-while True:                             #find sampling freq with first 500 samples
-    data = pd.read_csv(filename,sep="\t", header=None)
-    Nb=len(data)-1
-    if Nb>=Ns :
-        sf=Nb/(float(data[0][Nb-1].replace(',', '.'))-float(data[0][0].replace(',', '.')))
-        print('Sampling freq',sf)
-        N=int(windowsize*sf)            #number of samples to display to acheive set window size
-        for j in range(len(data)-1):                   #get data from file an convert to float
-            A.append(float(data[1][j].replace(',', '.'))*1000)
-        av1=np.average(A)
+# --- 1. ESPERA PELO ARQUIVO ---
+while True:
+    if os.path.isfile(filename) and os.path.getsize(filename) > 0:
         break
-    else : sleep(0.1)
+    print("Aguardando arquivo de dados...")
+    sleep(0.5)
 
-# grafico dinamico do deslocamento (µm) pelo tempo (s). flutuações em torno de 0
+# --- 2. CÁLCULO INICIAL DE FREQUÊNCIA E OFFSET ---
+while True:
+    try:
+        data = pd.read_csv(filename, sep="\t", header=None, decimal=',')
+        Nb = len(data) - 1
+        if Nb >= Ns:
+            total_t = data[0].iloc[Nb-1] - data[0].iloc[0]
+            sf = Nb / total_t
+            print(f'Sampling frequency detectada: {sf:.2f} Hz')
+            
+            N = int(windowsize * sf) 
+            av1 = np.average(data[1].iloc[:Ns] * 1000) 
+            break
+    except Exception as e:
+        print(f"Erro na leitura inicial: {e}")
+    sleep(0.5)
 
+# --- 3. FUNÇÃO DE ANIMAÇÃO ---
 def animate(i):
-    time = []
-    d = []
-    data = pd.read_csv(filename,sep="\t", header=None)
-    startindex= max(0, len(data)-N-1)                       #Crop data to N samples
-    endindex= len(data)-1
-    for i in range(startindex, endindex):                   #get data from file an convert to float
-        time.append(float(data[0][i].replace(',', '.')))
-        d.append(float(data[1][i].replace(',', '.'))*1000)
- 
-   
-    D.append(d)
-    if len(D)>1000:
-        av=np.average(D[-200:])
-        d=d-av                                                  #average out the signal
-    else: d=d-av1
-   
-    
-    plt.cla()
-    plt.plot(time, d)
-    plt.xlabel("Time (s)")
-    plt.ylabel("d (µm)")
+    try:
+        data = pd.read_csv(filename, sep="\t", header=None, decimal=',')
+        data_window = data.tail(N)
+        
+        time = data_window[0].values
+        d_raw = data_window[1].values * 1000 # µm
+        
+        # Filtro Butterworth (0.3 Hz para manter dinâmica visível)
+        if len(d_raw) > 30:
+            d_filtered = apply_lowpass_filter(d_raw, fs=sf, cutoff_freq=0.5)
+        else:
+            d_filtered = d_raw - av1
 
+        # --- CÁLCULO DSP: CONVERSÃO PARA EMPUXO (mN) ---
+        # 1. Ângulo em radianos (d em metros / L em metros)
+        theta = (d_filtered / 1e6) / L_LVDT 
+        # 2. Torque (k * theta)
+        torque = K_TORQUE * theta
+        # 3. Força em milli-Newtons (Torque / L_thrust * 1000)
+        thrust_mN = (torque / L_THRUST) * 1000
 
-ani = FuncAnimation(plt.gcf(), animate, interval=10, cache_frame_data=False)
+        plt.cla()
+        # Plota o sinal de Empuxo em verde (padrão para força)
+        plt.plot(time, thrust_mN, color='green', linewidth=1.5, label='Thrust Signal (mN)')
+        
+        plt.xlabel("Time (s)")
+        plt.ylabel("Thrust (mN)")
+        plt.title("Real-Time Thrust Monitoring (mN)")
+        plt.grid(True, alpha=0.3)
+        plt.legend(loc='upper right')
+        
+        if len(thrust_mN) > 0:
+            plt.ylim(np.min(thrust_mN) - 0.05, np.max(thrust_mN) + 0.05)
+            
+    except Exception:
+        pass
 
+# --- 4. EXECUÇÃO ---
+fig = plt.figure()
+ani = FuncAnimation(fig, animate, interval=50, cache_frame_data=False)
+plt.tight_layout()
 plt.show()

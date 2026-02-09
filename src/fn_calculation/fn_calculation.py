@@ -1,86 +1,74 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Feb 25 15:23:44 2025
-
-@author: Adm
+Análise de Frequência Natural (FFT + DSP)
+Focado em: Identificação da dinâmica estrutural da balança.
 """
-# Este código tem um objetivo principal: 
-# analisar vibrações de um sistema mecânico (como uma balança de microempuxo) para descobrir sua frequência natural 
-# de oscilação e limpar o sinal de interferências.
 
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.fft import rfft, rfftfreq
 import pandas as pd
-from scipy import signal
+from processing import apply_lowpass_filter 
 
+# --- 1. CONFIGURAÇÕES ---
+Filename = '5.caldata_m4_l5_F9,725.txt'
+cutoff_freq = 0.5  # 0.5Hz para não cortar a Fn por engano
+order = 5
+MaxF = 2 # 2Hz para dar "zoom" no que importa 
 
-Filename='5.caldata_m4_l5_F9,725.txt' # arquivo a ser analisado
-filtering=True  # Flag para ativar/desativar filtragem
-cutofffreq=0.02 # Frequência de corte do filtro (0.02 Hz)
-order=5 # Ordem do filtro Butterworth (5ª ordem)
+# --- 2. CARREGAMENTO DOS DADOS ---
+data = pd.read_csv(Filename, sep="\t", header=None, decimal=',')
+time = data[0].values
+d_raw = data[1].values * 1000
 
-MaxF=5 #Max freq to display in fft plot
+# Remoção de offset (Centraliza o sinal no zero para a FFT ser precisa)
+d_centered = d_raw - np.mean(d_raw)
 
-# Leitura e Pré-processamento dos dados (conversão de formato, remoção de offset)
-# Cria listas vazias para tempo (time) e deslocamento (d)
+# Cálculo da Frequência de Amostragem (fs)
+N = len(d_centered)
+fs = N / (time[-1] - time[0])
+print(f'Sampling Freq = {fs:.2f} Hz')
 
-time = [] 
-d = []
+# --- 3. PROCESSAMENTO DIGITAL DE SINAIS (DSP) ---
+# Filtra o sinal para limpar o espectro de frequências parasitas
+d_filtered = apply_lowpass_filter(d_centered, fs=fs, cutoff_freq=cutoff_freq)
 
+# FFT do sinal original e do sinal filtrado
+yf_raw = rfft(d_centered) / N * 2
+yf_filt = rfft(d_filtered) / N * 2
+xf = rfftfreq(N, 1/fs)
 
-data = pd.read_csv(Filename,sep="\t", header=None)
+# Identifica a Frequência Natural (Pico de maior amplitude no sinal filtrado)
+P = np.argmax(np.abs(yf_filt))
+fn = xf[P]
+print(f'Natural Freq Detectada = {fn:.5f} Hz')
 
-for i in range(len(data[0])):
-    time.append(float(data[0][i].replace(',', '.')))
-    d.append(float(data[1][i].replace(',', '.'))*1000)
+# --- 4. VISUALIZAÇÃO ---
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
 
-# Processamento do Sinal
+# Gráfico 1: Domínio do Tempo
+ax1.plot(time, d_centered, color='lightgray', alpha=0.7, label='Raw Signal')
+ax1.plot(time, d_filtered, color='blue', label='Filtered (DSP)')
+ax1.set_ylabel('Displacement (µm)')
+ax1.set_title('Signal Decays / Vibrations')
+ax1.legend()
+ax1.grid(True, alpha=0.3)
 
-av=np.average(d)
-d=d-av
+# Gráfico 2: Domínio da Frequência (FFT)
+# Limitando o gráfico para ver apenas até MaxF Hz
+mask = xf <= MaxF
+ax2.plot(xf[mask], np.abs(yf_raw[mask]), color='lightgray', label='Raw Spectrum')
+ax2.plot(xf[mask], np.abs(yf_filt[mask]), color='red', linewidth=1.5, label='Filtered Spectrum')
 
-N=len(d) # Calcula o número total de amostras
-# Calcula a frequência de amostragem (Hz) como o número de amostras dividido pela duração total do sinal
-fs=N/(float(data[0][N-1].replace(',', '.'))-float(data[0][0].replace(',', '.'))) 
-print('Sampling Freq =', fs, 'Hz')
+# Marcação da Frequência Natural
+ax2.plot(fn, np.abs(yf_filt[P]), "x", color='black', markersize=10, 
+         label=f'Natural Frequency: {fn:.4f} Hz')
 
-# Realiza análise espectral para encontrar frequência natural
+ax2.set_xlabel('Frequency (Hz)')
+ax2.set_ylabel('Magnitude')
+ax2.set_title('Fast Fourier Transform (FFT) Analysis')
+ax2.legend()
+ax2.grid(True, alpha=0.3)
 
-yf = rfft(d)/N*2 # Calcula a Transformada Rápida de Fourier para sinais reais
-xf = rfftfreq(N, 1/fs) # Gera o eixo de frequências correspondente
-
-P=np.argmax(np.abs(yf)) # Identifica a frequência com maior amplitude (frequência natural)
-
-print('Natural Freq =',xf[P], 'Hz')
-
-# Opcionalmente aplica filtro passa-baixas
-
-if filtering==True:
-    # Projeta um filtro Butterworth passa-baixas com os parâmetros especificados
-    b, a = signal.butter(order, cutofffreq, analog=False, btype='lowpass', fs=fs)
-    filtd = signal.filtfilt(b, a, d) # Aplica o filtro sem distorção de fase
-    filtyf = rfft(filtd)/N*2
-    filtxf = rfftfreq(N, 1/fs)
-
-# Visualiza os resultados no domínio do tempo e da frequência
-# Gráfico superior: Sinal no domínio do tempo (original + filtrado se aplicável)
-# Gráfico inferior: Espectro de frequência (com destaque para a frequência natural)
-
-fig, (ax1, ax2) = plt.subplots(2)
-ax1.plot(time, d)
-ax1.set(xlabel='Time (s)', ylabel='d (µm)')
-ax1.grid()
-
-ax2.plot(xf[:int(MaxF*N/fs)], np.abs(yf[:int(MaxF*N/fs)]))    #fft plot croped to MaxF Hz
-ax2.plot(xf[P], np.abs(yf[P]), "x", color = 'r',  label=f'Natural Frequency={xf[P]:.5f} Hz')
-if filtering==True:
-    ax1.plot(time, filtd, label='Filtered Signal')
-    ax2.plot(filtxf[:int(MaxF*N/fs)], np.abs(filtyf[:int(MaxF*N/fs)]), label='Filtered Signal')   
-ax2.set(xlabel='freq', ylabel='Ampl')
-plt.legend()
-ax2.grid()
+plt.tight_layout()
 plt.show()
-
-
-
