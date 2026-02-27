@@ -7,7 +7,7 @@ from scipy.integrate import solve_ivp
 # =====================================
 
 I = 0.025       # momento de inércia [kg.m²] - Resistência do sistema à aceleração angular.
-c = 0.002       # coeficiente de amortecimento viscoso [N.m.s/rad] - Dissipação de energia por viscosidade.
+c = 0.0002       # coeficiente de amortecimento viscoso [N.m.s/rad] - Dissipação de energia por viscosidade.
 k = 1.5         # rigidez torsional [N.m/rad] - Constante de mola angular do fio de suspensão.
 L = 0.3675      # braço da força [m] - Distância do eixo à aplicação da força.
 
@@ -33,11 +33,17 @@ def F(t):
 # SISTEMA DINÂMICO
 # =====================================
 
-def balanca_dinamica(t, x):
-    theta, omega = x
+def balanca_dinamica(t, x): # tempo e vetor de estado 
+    theta, omega = x # vetor de estado: deflexão angular e velocidade angular
 
-    theta_dot = omega
+    theta_dot = omega # a variação da posição no tempo é igual à velocidade angular
+    # omega_dot é a aceleração angular, que é determinada pela soma dos torques aplicados ao sistema, dividida pelo momento de inércia.
+
     omega_dot = (L/I) * F(t) - (c/I) * omega - (k/I) * theta
+    # Termos da equação de movimento:
+    # (L/I) . F(t): O torque causado por uma força externa aplicada a uma distância L.
+    # -(c/I) . omega: A força de amortecimento (atrito), que se opõe ao movimento.
+    # -(k/I) . theta: A força de restauração (mola), que tenta trazer a balança de volta ao centro.
 
     return [theta_dot, omega_dot]
 
@@ -45,7 +51,7 @@ def balanca_dinamica(t, x):
 # CONDIÇÕES INICIAIS
 # =====================================
 
-x0 = [0.0, 0.0]
+x0 = [0.0, 0.0] # vetor de estado inicial: [deflexão angular, velocidade angular] - A balança começa em repouso, sem deflexão e sem movimento angular.
 
 # =====================================
 # TEMPO DE SIMULAÇÃO
