@@ -13,8 +13,8 @@ L = 0.3675      # braço da força [m] - Distância do eixo à aplicação da fo
 
 print("Iniciando.")
 
-omega_0 = np.sqrt(k / I)
-zeta = c / (2 * np.sqrt(k * I))
+omega_0 = np.sqrt(k / I)  # frequência natural do sistema (sem amortecimento) [rad/s] - A frequência na qual o sistema oscilaria se não houvesse amortecimento.
+zeta = c / (2 * np.sqrt(k * I)) # fator de amortecimento adimensional - Indica o tipo de resposta do sistema (subamortecido, criticamente amortecido ou superamortecido).
 
 print(f"ω₀ = {omega_0:.4f} rad/s")
 print(f"ζ  = {zeta:.4f}")
@@ -82,10 +82,6 @@ sol = solve_ivp(
 theta = sol.y[0] # deflexão angular [rad] - A resposta do sistema à força aplicada ao longo do tempo.
 omega = sol.y[1] # velocidade angular [rad/s] - A taxa de variação da deflexão angular, que também é afetada pela força aplicada e pelas características do sistema (inércia, amortecimento e rigidez).
 time = sol.t # vetor de tempo correspondente às soluções obtidas para theta e omega, utilizado para plotar a resposta do sistema ao longo do tempo.
-
-print("- Deflexão angular [rad]:", theta)
-print("- Velocidade angular [rad/s]:", omega)
-print("- Tempo [s]:", time)
 
 # =====================================
 # PLOTS
